@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
     private TabsAccessorAdapter mTabsAccessorAdapter;
 
-    // fb
+    // fb test
     private FirebaseUser currentUser;
 
     @Override
