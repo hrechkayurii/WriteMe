@@ -36,9 +36,11 @@
                 android:layout_below="@+id/login_image"
                 android:hint="Email..."
                 android:inputType="textEmailAddress"
-                android:padding="9dp"
+                android:padding="5dp"
                 android:drawableStart="@drawable/email"
-
+                android:layout_marginTop="25dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginLeft="17dp"
                 />
 
         </RelativeLayout>
