@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Error: "+ message, Toast.LENGTH_SHORT).show();
                             }
 
-                            //loadingBar.dismiss();
+                            loadingBar.dismiss();
 
                         }
                     });
