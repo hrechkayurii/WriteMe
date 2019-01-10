@@ -106,14 +106,14 @@ public class LoginActivity extends AppCompatActivity {
         loadingBar = new ProgressDialog(this);
     }
 
-    @Override
+    /*@Override
     protected void onStart() {
         super.onStart();
 
         if (currentUser != null){
             sendUserToMainActivity();
         }
-    }
+    }*/
 
     private void sendUserToMainActivity() {
 

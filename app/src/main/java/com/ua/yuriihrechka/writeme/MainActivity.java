@@ -44,14 +44,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*@Override
+    @Override
     protected void onStart() {
         super.onStart();
 
         if (currentUser == null){
             sendUserToLoginActivity();
         }
-    }*/
+    }
 
     private void sendUserToLoginActivity() {
 
