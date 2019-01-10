@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         else {
 
-            loadingBar.setTitle("Creating new account");
+            loadingBar.setTitle("Sing in");
             loadingBar.setMessage("Please wait...");
             loadingBar.setCanceledOnTouchOutside(true);
             loadingBar.show();

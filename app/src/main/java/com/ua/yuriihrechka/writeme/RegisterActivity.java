@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
         else {
 
-            loadingBar.setTitle("Sing in");
+            loadingBar.setTitle("Creating new account");
             loadingBar.setMessage("Please wait...");
             loadingBar.setCanceledOnTouchOutside(true);
             loadingBar.show();
