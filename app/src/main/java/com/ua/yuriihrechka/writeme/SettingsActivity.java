@@ -7,7 +7,7 @@ import android.widget.EditText;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class SettindsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
 
     private Button updateAccountButton;

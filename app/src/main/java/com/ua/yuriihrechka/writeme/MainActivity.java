@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendUserToSettingsActivity() {
 
-        Intent settingsIntent = new Intent(MainActivity.this, SettindsActivity.class);
+        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
     }
 }
