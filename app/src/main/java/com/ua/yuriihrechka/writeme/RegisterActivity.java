@@ -85,8 +85,8 @@ public class RegisterActivity extends AppCompatActivity {
                     if (task.isSuccessful()){
                         //sendUserToLoginActivity();
 
-                        String currentUser = mAuth.getCurrentUser().getUid();
-                        mRootRef.child("Users").child(currentUser).setValue("");
+                        String currentUserID = mAuth.getCurrentUser().getUid();
+                        mRootRef.child("Users").child(currentUserID).setValue("");
                         sendUserToMainActivity();
                         Toast.makeText(RegisterActivity.this, "Successful", Toast.LENGTH_SHORT).show();
                     }else {
