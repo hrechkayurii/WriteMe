@@ -1,6 +1,7 @@
 package com.ua.yuriihrechka.writeme;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,11 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
     private TabsAccessorAdapter mTabsAccessorAdapter;
+    private DatabaseReference mRootRef;
 
     // Firebase
     private FirebaseUser currentUser;
@@ -30,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        mRootRef = FirebaseDatabase.getInstance().getReference();
 
         mToolbar = (Toolbar)findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
@@ -50,9 +58,27 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser == null){
             sendUserToLoginActivity();
+        }else {
+            VerifyUserExistance();
         }
     }
 
+    private void VerifyUserExistance() {
+
+        String carrentYserID = mAuth.getCurrentUser().getUid();
+        mRootRef.child(carrentYserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
 
     @Override
