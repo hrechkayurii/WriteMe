@@ -53,11 +53,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendUserToLoginActivity() {
 
-        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(loginIntent);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -77,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.main_settings_option){
-
+            sendUserToSettingsActivity();
         }
 
         if (item.getItemId() == R.id.main_find_friends_option){
@@ -85,5 +81,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void sendUserToLoginActivity() {
+
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
+    }
+
+    private void sendUserToSettingsActivity() {
+
+        Intent settingsIntent = new Intent(MainActivity.this, SettindsActivity.class);
+        startActivity(settingsIntent);
     }
 }
