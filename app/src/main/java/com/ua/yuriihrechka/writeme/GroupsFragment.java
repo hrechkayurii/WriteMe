@@ -1,6 +1,7 @@
 package com.ua.yuriihrechka.writeme;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -45,7 +47,7 @@ public class GroupsFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         groupFragmentView = inflater.inflate(R.layout.fragment_groups, container, false);
@@ -57,7 +59,18 @@ public class GroupsFragment extends Fragment {
         initializeFields();
         retrieveAndDisplayGroup();
 
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                String currentGroupName = parent.getItemAtPosition(position).toString();
+
+                Intent intent = new Intent(getContext(), GroupChatActivity.class);
+                intent.putExtra("groupName", currentGroupName);
+                startActivity(intent);
+
+            }
+        });
 
         return groupFragmentView;
     }
