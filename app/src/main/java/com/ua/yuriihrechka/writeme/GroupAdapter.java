@@ -20,14 +20,18 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
     @NonNull
     @Override
     public GroupViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new GroupViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rs_fragment_groups, viewGroup, false));
+        //return new GroupViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rs_fragment_groups, viewGroup, false));
+
+        View v = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.rs_fragment_groups, viewGroup, false);
+        return new GroupViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull GroupViewHolder groupViewHolder, int i) {
 
         GroupModel group = mList.get(i);
-        groupViewHolder.mTextView.setText(group.name);
+        groupViewHolder.mTextView.setText(group.name.toString());
 
 
     }
