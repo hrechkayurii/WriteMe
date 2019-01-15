@@ -30,20 +30,12 @@ import java.util.Set;
 
 public class GroupsFragment extends Fragment {
 
-
     private View groupFragmentView;
     private ListView list_view;
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> list_of_groups = new ArrayList<>();
 
-
     private DatabaseReference mGroupRef;
-
-    ///
-    //private RecyclerView recyclerView;
-    //private List<GroupModel> groupList;
-    //private GroupAdapter adapter;
-
 
 
     @Override
@@ -51,8 +43,6 @@ public class GroupsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         groupFragmentView = inflater.inflate(R.layout.fragment_groups, container, false);
-
-
 
         mGroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
@@ -64,11 +54,9 @@ public class GroupsFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String currentGroupName = parent.getItemAtPosition(position).toString();
-
                 Intent intent = new Intent(getContext(), GroupChatActivity.class);
                 intent.putExtra("groupName", currentGroupName);
                 startActivity(intent);
-
             }
         });
 
@@ -82,25 +70,18 @@ public class GroupsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 Iterator iterator = dataSnapshot.getChildren().iterator();
-
                 Set<String>set = new HashSet<>();
-
                 while (iterator.hasNext()){
-
                     set.add(((DataSnapshot)iterator.next()).getKey());
-
-
                 }
 
                 list_of_groups.clear();
                 list_of_groups.addAll(set);
                 arrayAdapter.notifyDataSetChanged();
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
@@ -110,8 +91,6 @@ public class GroupsFragment extends Fragment {
         list_view = (ListView) groupFragmentView.findViewById(R.id.list_view);
         arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, list_of_groups);
         list_view.setAdapter(arrayAdapter);
-
-
 
     }
 
