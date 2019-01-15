@@ -88,6 +88,42 @@
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="15dp"
                 android:layout_marginLeft="23dp"
+                android:layout_marginBottom="8dp"
+                />
+
+
+            <TextView
+                android:id="@+id/login_uses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/need_new_account_link"
+                android:text="or ligin using your"
+                android:textAlignment="center"
+                android:padding="2dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="23dp"
+                />
+
+
+            <Button
+                android:id="@+id/phone_login_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:layout_below="@+id/login_uses"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="19dp"
+                android:layout_marginLeft="19dp"
+                android:text="Phone"
+                android:textAllCaps="false"
+                android:textSize="24sp"
+                android:textAlignment="center"
+                android:textColor="@android:color/background_light"
+                android:background="@drawable/button"
+                android:drawableStart="@drawable/ic_phone_black"
                 />
 
         </RelativeLayout>

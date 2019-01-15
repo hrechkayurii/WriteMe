@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private Button loginButton;
+    private Button loginButton, phoneLoginBtn;
     private EditText userEmail, userPassword;
     private TextView needNewAccountLink;
 
@@ -53,6 +53,15 @@ public class LoginActivity extends AppCompatActivity {
                 AllowUserToLogin();
             }
         });
+
+        phoneLoginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentPhone = new Intent(LoginActivity.this, PhoneLoginActivity.class);
+                startActivity(intentPhone);
+            }
+        });
+
     }
 
     private void AllowUserToLogin() {
@@ -102,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
         userEmail = (EditText)findViewById(R.id.login_email);
         userPassword = (EditText)findViewById(R.id.login_password);
         needNewAccountLink = (TextView)findViewById(R.id.need_new_account_link);
-
+        phoneLoginBtn = (Button)findViewById(R.id.phone_login_button);
         loadingBar = new ProgressDialog(this);
     }
 
