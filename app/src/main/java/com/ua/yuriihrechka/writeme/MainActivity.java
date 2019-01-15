@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                     sendUserToSettingsActivity();
                    // Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
                 }
-
             }
 
             @Override
@@ -174,8 +173,6 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(MainActivity.this, groupName +  " group is create.", Toast.LENGTH_SHORT).show();
-
-
                 }
             }
         });
