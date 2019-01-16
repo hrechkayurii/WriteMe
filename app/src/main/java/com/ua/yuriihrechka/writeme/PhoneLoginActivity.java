@@ -27,7 +27,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
     private Button sendVerificationCodeBtn;
     private Button verifyBtn;
-    private EditText inputPhoneNumer;
+    private EditText inputPhoneNumber;
     private EditText inputVerificationCode;
     private ProgressDialog mProgressDialog;
 
@@ -51,7 +51,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 sendVerificationCodeBtn.setVisibility(View.INVISIBLE);
-                inputPhoneNumer.setVisibility(View.INVISIBLE);
+                inputPhoneNumber.setVisibility(View.INVISIBLE);
 
                 String verificationCode = inputVerificationCode.getText().toString();
                 if (TextUtils.isEmpty(verificationCode)){
@@ -72,13 +72,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
         sendVerificationCodeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*sendVerificationCodeBtn.setVisibility(View.INVISIBLE);
-                inputPhoneNumer.setVisibility(View.INVISIBLE);
 
-                verifyBtn.setVisibility(View.VISIBLE);
-                inputVerificationCode.setVisibility(View.VISIBLE);*/
-
-                String phoneNumber = inputPhoneNumer.getText().toString();
+                String phoneNumber = inputPhoneNumber.getText().toString();
                 if (TextUtils.isEmpty(phoneNumber)){
                     Toast.makeText(PhoneLoginActivity.this, "Enter phone number", Toast.LENGTH_LONG).show();
                 }else {
@@ -112,7 +107,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 Toast.makeText(PhoneLoginActivity.this, "Error: "+e, Toast.LENGTH_LONG).show();
 
                 sendVerificationCodeBtn.setVisibility(View.VISIBLE);
-                inputPhoneNumer.setVisibility(View.VISIBLE);
+                inputPhoneNumber.setVisibility(View.VISIBLE);
 
                 verifyBtn.setVisibility(View.INVISIBLE);
                 inputVerificationCode.setVisibility(View.INVISIBLE);
@@ -132,7 +127,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 Toast.makeText(PhoneLoginActivity.this, "please check and verify...", Toast.LENGTH_LONG).show();
 
                 sendVerificationCodeBtn.setVisibility(View.INVISIBLE);
-                inputPhoneNumer.setVisibility(View.INVISIBLE);
+                inputPhoneNumber.setVisibility(View.INVISIBLE);
 
                 verifyBtn.setVisibility(View.VISIBLE);
                 inputVerificationCode.setVisibility(View.VISIBLE);
@@ -145,7 +140,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
     private void init() {
         sendVerificationCodeBtn = (Button) findViewById(R.id.send_verification_button);
         verifyBtn = (Button) findViewById(R.id.verify_button);
-        inputPhoneNumer = (EditText) findViewById(R.id.phone_number_input);
+        inputPhoneNumber = (EditText) findViewById(R.id.phone_number_input);
         inputVerificationCode = (EditText) findViewById(R.id.verification_code_input);
 
         mProgressDialog = new ProgressDialog(this);
@@ -164,7 +159,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
                             mProgressDialog.dismiss();
                             Toast.makeText(PhoneLoginActivity.this, "Successful", Toast.LENGTH_LONG).show();
-                            sendUserTomainActivity();
+                            sendUserToMainActivity();
 
                         } else {
 
@@ -175,7 +170,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void sendUserTomainActivity() {
+    private void sendUserToMainActivity() {
 
         Intent intentMainActivity = new Intent(PhoneLoginActivity.this, MainActivity.class);
         startActivity(intentMainActivity);
