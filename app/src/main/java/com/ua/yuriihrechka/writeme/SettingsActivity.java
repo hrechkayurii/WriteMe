@@ -3,6 +3,7 @@ package com.ua.yuriihrechka.writeme;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,6 +20,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -38,6 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
     private DatabaseReference mRootRef;
 
     private static final int galleryPick = 1;
+    private StorageReference userProfImgRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentUserId = mAuth.getCurrentUser().getUid();
         mRootRef = FirebaseDatabase.getInstance().getReference();
+        userProfImgRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
 
         initializeFields();
 
@@ -73,7 +79,50 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == galleryPick && resultCode == RESULT_OK && data != null){
+            Uri uriImage = data.getData();
+
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1,1)
+                    .start(this);
+
+        }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            if(resultCode == RESULT_OK){
+                Uri resultUri = result.getUri();
+                StorageReference filePath = userProfImgRef.child(currentUserId +".jpg");
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                        if (task.isSuccessful()){
+                            Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
+                        }else {
+                            String message = task.getException().toString();
+                            Toast.makeText(SettingsActivity.this, "Error upload: "+ message, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+            }
+
+        }
+
+
+
+    }
+
+    /* @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == galleryPick && resultCode == RESULT_OK && data != null){
             Uri uriImage = data.getData();
@@ -88,11 +137,29 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
+            if(requestCode == RESULT_OK){
+                Uri resultUri = result.getUri();
+                StorageReference filePath = userProfImgRef.child(currentUserId +".jpg");
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                        if (task.isSuccessful()){
+                            Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
+                        }else {
+                            String message = task.getException().toString();
+                            Toast.makeText(SettingsActivity.this, "Error upload: "+ message, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+            }
 
         }
-    }
+    }*/
 
     private void RetrieveUserInfo() {
 
