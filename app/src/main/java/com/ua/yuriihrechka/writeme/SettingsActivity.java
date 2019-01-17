@@ -117,49 +117,9 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
 
-
     }
 
-    /* @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == galleryPick && resultCode == RESULT_OK && data != null){
-            Uri uriImage = data.getData();
-
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1,1)
-                    .start(this);
-
-        }
-
-
-
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-
-            if(requestCode == RESULT_OK){
-                Uri resultUri = result.getUri();
-                StorageReference filePath = userProfImgRef.child(currentUserId +".jpg");
-                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-
-                        if (task.isSuccessful()){
-                            Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
-                        }else {
-                            String message = task.getException().toString();
-                            Toast.makeText(SettingsActivity.this, "Error upload: "+ message, Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-
-            }
-
-        }
-    }*/
 
     private void RetrieveUserInfo() {
 
