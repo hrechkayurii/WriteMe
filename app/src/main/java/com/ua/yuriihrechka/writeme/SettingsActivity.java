@@ -15,6 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -87,21 +89,22 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == galleryPick && resultCode == RESULT_OK && data != null){
+        if (requestCode == galleryPick && resultCode == RESULT_OK && data != null) {
             Uri uriImage = data.getData();
 
             CropImage.activity()
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1,1)
+                    .setAspectRatio(1, 1)
                     .start(this);
 
         }
+
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-            if(resultCode == RESULT_OK){
+            if (resultCode == RESULT_OK) {
 
                 progressDialog.setTitle("upload img");
                 progressDialog.setMessage("wait ...");
@@ -109,18 +112,69 @@ public class SettingsActivity extends AppCompatActivity {
                 progressDialog.show();
 
                 Uri resultUri = result.getUri();
-                StorageReference filePath = userProfImgRef.child(currentUserId +".jpg");
-                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                final StorageReference filePath = userProfImgRef.child(currentUserId + ".jpg");
+
+
+                ///////
+                filePath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
+
+
+                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                final String downloadUri = uri.toString();
+
+                                mRootRef.child("Users").child(currentUserId).child("image")
+                                        .setValue(downloadUri)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                if (task.isSuccessful()) {
+                                                    Toast.makeText(SettingsActivity.this, "Upload image...", Toast.LENGTH_LONG).show();
+
+                                                } else {
+                                                    String message = task.getException().toString();
+                                                    Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_LONG).show();
+
+                                                }
+                                            }
+                                        });
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                String message = e.toString();
+                                Toast.makeText(SettingsActivity.this, "Error upload: " + message, Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+
+                        progressDialog.dismiss();
+
+                    }
+                });
+            }
+        }
+    }
+
+                /*filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-
-
 
                         if (task.isSuccessful()){
                             Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
 
 
-                            final String downloadUri = task.getResult().getStorage().getDownloadUrl().toString();
+                            @SuppressWarnings("VisibleForTests")  Uri uriPhoto = task.getResult().getDownloadUrl();
+                            final String downloadUri = uriPhoto.toString();
+                            //final String downloadUri = task.getResult().getStorage().getDownloadUrl().toString();
+
                             mRootRef.child("Users").child(currentUserId).child("image")
                                     .setValue(downloadUri)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -144,14 +198,9 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                         progressDialog.dismiss();
                     }
-                });
-
-            }
-
-        }
+                });*/
 
 
-    }
 
 
 
