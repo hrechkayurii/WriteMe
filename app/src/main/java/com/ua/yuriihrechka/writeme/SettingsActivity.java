@@ -3,15 +3,14 @@ package com.ua.yuriihrechka.writeme;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,6 +41,9 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText userName, userStatus;
     private CircleImageView userProfileImage;
     private String currentUserId;
+    private String downloadUri;
+    private String currentPhotoRef;
+
 
     private FirebaseAuth mAuth;
     private DatabaseReference mRootRef;
@@ -63,7 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         initializeFields();
 
-        userName.setVisibility(View.INVISIBLE);
+        //userName.setVisibility(View.INVISIBLE);
 
         updateAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +128,9 @@ public class SettingsActivity extends AppCompatActivity {
                         filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                final String downloadUri = uri.toString();
+
+                                downloadUri = uri.toString();
+                                currentPhotoRef = downloadUri;
 
                                 mRootRef.child("Users").child(currentUserId).child("image")
                                         .setValue(downloadUri)
@@ -206,43 +210,50 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void RetrieveUserInfo() {
 
-        mRootRef.child("Users").child(currentUserId)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        mRootRef.child("Users");
+        mRootRef.child(currentUserId);
+        mRootRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                        if ((dataSnapshot.exists())
+                if ((dataSnapshot.exists())
                         && (dataSnapshot.hasChild("name"))
-                        && (dataSnapshot.hasChild("image"))){
+                        && (dataSnapshot.hasChild("image"))) {
 
-                            String retrieveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retrieveStatus = dataSnapshot.child("status").getValue().toString();
-                            String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
+                    String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                    String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+                    String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
 
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveStatus);
 
-                            Picasso.get().load(retrieveProfileImage).into(userProfileImage);
 
-                        }else if((dataSnapshot.exists())
-                                && (dataSnapshot.hasChild("name"))){
-                            String retrieveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+                    userName.setText(retrieveUserName);
+                    userStatus.setText(retrieveStatus);
+                    currentPhotoRef = retrieveProfileImage;
 
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveStatus);
+                    Picasso.get().load(retrieveProfileImage).into(userProfileImage);
 
-                        }else {
-                            Toast.makeText(SettingsActivity.this, "Set & update...", Toast.LENGTH_SHORT).show();
-                        }
+                } else if ((dataSnapshot.exists())
+                        && (dataSnapshot.hasChild("name"))) {
 
-                    }
+                    String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                    String retrieveStatus = dataSnapshot.child("status").getValue().toString();
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    userName.setText(retrieveUserName);
+                    userStatus.setText(retrieveStatus);
 
-                    }
-                });
+                } else {
+                    Toast.makeText(SettingsActivity.this, "Set & update...", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -262,6 +273,10 @@ public class SettingsActivity extends AppCompatActivity {
             profileMap.put("uid", currentUserId);
             profileMap.put("name", setUserName);
             profileMap.put("status", setStatus);
+            if (currentPhotoRef != null){
+                profileMap.put("image", currentPhotoRef);
+            }
+
 
             mRootRef.child("Users").child(currentUserId).setValue(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
