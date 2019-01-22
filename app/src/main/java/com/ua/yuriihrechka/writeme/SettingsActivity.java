@@ -1,11 +1,12 @@
 package com.ua.yuriihrechka.writeme;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -37,12 +41,17 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText userName, userStatus;
     private CircleImageView userProfileImage;
     private String currentUserId;
+    private String downloadUri;
+    private String currentPhotoRef;
+
 
     private FirebaseAuth mAuth;
     private DatabaseReference mRootRef;
 
     private static final int galleryPick = 1;
     private StorageReference userProfImgRef;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         initializeFields();
 
-        userName.setVisibility(View.INVISIBLE);
+        //userName.setVisibility(View.INVISIBLE);
 
         updateAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,81 +91,169 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == galleryPick && resultCode == RESULT_OK && data != null){
+        if (requestCode == galleryPick && resultCode == RESULT_OK && data != null) {
             Uri uriImage = data.getData();
 
             CropImage.activity()
                     .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1,1)
+                    .setAspectRatio(1, 1)
                     .start(this);
 
         }
+
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-            if(resultCode == RESULT_OK){
+            if (resultCode == RESULT_OK) {
+
+                progressDialog.setTitle("upload img");
+                progressDialog.setMessage("wait ...");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
+
                 Uri resultUri = result.getUri();
-                StorageReference filePath = userProfImgRef.child(currentUserId +".jpg");
-                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                final StorageReference filePath = userProfImgRef.child(currentUserId + ".jpg");
+
+
+                ///////
+                filePath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
+
+
+                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+
+                                downloadUri = uri.toString();
+                                currentPhotoRef = downloadUri;
+
+                                mRootRef.child("Users").child(currentUserId).child("image")
+                                        .setValue(downloadUri)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                if (task.isSuccessful()) {
+                                                    Toast.makeText(SettingsActivity.this, "Upload image...", Toast.LENGTH_LONG).show();
+
+                                                } else {
+                                                    String message = task.getException().toString();
+                                                    Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_LONG).show();
+
+                                                }
+                                            }
+                                        });
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                String message = e.toString();
+                                Toast.makeText(SettingsActivity.this, "Error upload: " + message, Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+
+                        progressDialog.dismiss();
+
+                    }
+                });
+            }
+        }
+    }
+
+                /*filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
                         if (task.isSuccessful()){
                             Toast.makeText(SettingsActivity.this, "Successful upload", Toast.LENGTH_LONG).show();
+
+
+                            @SuppressWarnings("VisibleForTests")  Uri uriPhoto = task.getResult().getDownloadUrl();
+                            final String downloadUri = uriPhoto.toString();
+                            //final String downloadUri = task.getResult().getStorage().getDownloadUrl().toString();
+
+                            mRootRef.child("Users").child(currentUserId).child("image")
+                                    .setValue(downloadUri)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if (task.isSuccessful()){
+                                                Toast.makeText(SettingsActivity.this, "Upload image...", Toast.LENGTH_LONG).show();
+
+                                            }else {
+                                                String message = task.getException().toString();
+                                                Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_LONG).show();
+
+                                            }
+                                        }
+                                    });
+
                         }else {
                             String message = task.getException().toString();
                             Toast.makeText(SettingsActivity.this, "Error upload: "+ message, Toast.LENGTH_LONG).show();
                         }
+                        progressDialog.dismiss();
                     }
-                });
-
-            }
-
-        }
+                });*/
 
 
-    }
 
 
 
     private void RetrieveUserInfo() {
 
-        mRootRef.child("Users").child(currentUserId)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        mRootRef.child("Users");
+        mRootRef.child(currentUserId);
+        mRootRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                        if ((dataSnapshot.exists())
+                if ((dataSnapshot.exists())
                         && (dataSnapshot.hasChild("name"))
-                        && (dataSnapshot.hasChild("image"))){
+                        && (dataSnapshot.hasChild("image"))) {
 
-                            String retriveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retriveStatus = dataSnapshot.child("status").getValue().toString();
-                            String retriveProfileImage = dataSnapshot.child("image").getValue().toString();
+                    String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                    String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+                    String retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
 
-                            userName.setText(retriveUserName);
-                            userStatus.setText(retriveStatus);
 
-                        }else if((dataSnapshot.exists())
-                                && (dataSnapshot.hasChild("name"))){
-                            String retriveUserName = dataSnapshot.child("name").getValue().toString();
-                            String retriveStatus = dataSnapshot.child("status").getValue().toString();
 
-                            userName.setText(retriveUserName);
-                            userStatus.setText(retriveStatus);
-                        }else {
-                            Toast.makeText(SettingsActivity.this, "Set & update...", Toast.LENGTH_SHORT).show();
-                        }
+                    userName.setText(retrieveUserName);
+                    userStatus.setText(retrieveStatus);
+                    currentPhotoRef = retrieveProfileImage;
 
-                    }
+                    Picasso.get().load(retrieveProfileImage).into(userProfileImage);
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                } else if ((dataSnapshot.exists())
+                        && (dataSnapshot.hasChild("name"))) {
 
-                    }
-                });
+                    String retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                    String retrieveStatus = dataSnapshot.child("status").getValue().toString();
+
+                    userName.setText(retrieveUserName);
+                    userStatus.setText(retrieveStatus);
+
+                } else {
+                    Toast.makeText(SettingsActivity.this, "Set & update...", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -176,6 +273,10 @@ public class SettingsActivity extends AppCompatActivity {
             profileMap.put("uid", currentUserId);
             profileMap.put("name", setUserName);
             profileMap.put("status", setStatus);
+            if (currentPhotoRef != null){
+                profileMap.put("image", currentPhotoRef);
+            }
+
 
             mRootRef.child("Users").child(currentUserId).setValue(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -213,6 +314,7 @@ public class SettingsActivity extends AppCompatActivity {
         userName = (EditText) findViewById(R.id.set_user_name);
         userStatus = (EditText) findViewById(R.id.set_profile_status);
         userProfileImage = (CircleImageView) findViewById(R.id.profile_image);
+        progressDialog = new ProgressDialog(this);
 
     }
 }
