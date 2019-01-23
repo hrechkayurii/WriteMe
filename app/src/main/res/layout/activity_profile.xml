@@ -15,10 +15,11 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="110dp"
-        android:src="@drawable/profile"
+        android:src="@drawable/profile_image"
         />
 
     <TextView
+        android:id="@+id/visit_user_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="user name"
@@ -28,8 +29,40 @@
         android:layout_marginTop="5dp"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/visit_user_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="user status"
+        android:layout_below="@+id/visit_user_name"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="25dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="25sp"
+
+        />
+
+    <Button
+        android:id="@+id/send_message_request_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/visit_user_status"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="65dp"
+        android:layout_marginRight="65dp"
+        android:textColor="@android:color/background_light"
+        android:background="@drawable/button"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:text="Send message"
+        android:textAllCaps="false"
+
         />
 
 </RelativeLayout>

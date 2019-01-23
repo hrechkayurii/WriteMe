@@ -47,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mRootRef;
+    private DatabaseReference dbUserRef;
 
     private static final int galleryPick = 1;
     private StorageReference userProfImgRef;
@@ -62,6 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
         currentUserId = mAuth.getCurrentUser().getUid();
         mRootRef = FirebaseDatabase.getInstance().getReference();
         userProfImgRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
+        dbUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         initializeFields();
 
@@ -210,9 +212,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void RetrieveUserInfo() {
 
-        mRootRef.child("Users");
-        mRootRef.child(currentUserId);
-        mRootRef.addValueEventListener(new ValueEventListener() {
+
+            dbUserRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
