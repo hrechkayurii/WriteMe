@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,7 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String currentState;
     private String senderUserID;
 
-    private DatabaseReference dbUserRef;
+    private DatabaseReference dbUserRef, dbChatRequestRef;
     private FirebaseAuth auth;
 
     @Override
@@ -38,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         dbUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        dbChatRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat request");
         auth = FirebaseAuth.getInstance();
         senderUserID = auth.getCurrentUser().getUid();
 
@@ -105,11 +108,40 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void manageChatRequest(){
 
-        if (senderUserID.equals(receiverUserID)){
+        dbChatRequestRef.child(senderUserID)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if (dataSnapshot.hasChild(receiverUserID)){
+                            String request_type = dataSnapshot.child(receiverUserID).child("request_type")
+                                    .getValue().toString();
+
+                            if (request_type.equals("sent")){
+                                currentState = "request_sent";
+                                sendMessageRequestButton.setText("Cancel chat request");
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+        if (!senderUserID.equals(receiverUserID)){
 
             sendMessageRequestButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    sendMessageRequestButton.setEnabled(false);
+                    if (currentState.equals("new")){
+                        sendChatRequest();
+                    }
 
                 }
             });
@@ -117,6 +149,32 @@ public class ProfileActivity extends AppCompatActivity {
         }else {
             sendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
+
+    }
+
+    private void sendChatRequest() {
+
+        dbChatRequestRef.child(senderUserID).child(receiverUserID)
+                .child("request_type").setValue("sent")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            dbChatRequestRef.child(receiverUserID).child(senderUserID)
+                                    .child("request_type").setValue("received")
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                sendMessageRequestButton.setEnabled(true);
+                                                currentState = "request_sent";
+                                                sendMessageRequestButton.setText("Cancel chat request");
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                });
 
     }
 }
