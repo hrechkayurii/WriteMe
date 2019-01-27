@@ -26,7 +26,7 @@ public class ProfileActivity extends AppCompatActivity {
     private CircleImageView userProfileImage;
     private TextView userProfileName;
     private TextView userProfileStatus;
-    private Button sendMessageRequestButton;
+    private Button sendMessageRequestButton, declineMessageRequestButton;
 
     private String currentState;
     private String senderUserID;
@@ -101,6 +101,7 @@ public class ProfileActivity extends AppCompatActivity {
          userProfileName = (TextView)findViewById(R.id.visit_user_name);
          userProfileStatus = (TextView)findViewById(R.id.visit_user_status);
          sendMessageRequestButton = (Button)findViewById(R.id.send_message_request_button);
+         declineMessageRequestButton = (Button)findViewById(R.id.decline_message_request_button);
 
          currentState = "new";
 
@@ -120,6 +121,19 @@ public class ProfileActivity extends AppCompatActivity {
                             if (request_type.equals("sent")){
                                 currentState = "request_sent";
                                 sendMessageRequestButton.setText("Cancel chat request");
+                            }else if (request_type.equals("received")){
+                                currentState = "request_received";
+                                sendMessageRequestButton.setText("Accept chat request");
+                                declineMessageRequestButton.setVisibility(View.VISIBLE);
+                                declineMessageRequestButton.setEnabled(true);
+
+                                declineMessageRequestButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        cancelChatRequest();
+                                    }
+                                });
+
                             }
                         }
 
@@ -143,12 +157,49 @@ public class ProfileActivity extends AppCompatActivity {
                         sendChatRequest();
                     }
 
+                    if (currentState.equals("request_sent")){
+                        cancelChatRequest();
+                    }
                 }
             });
 
         }else {
             sendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
+
+    }
+
+    private void cancelChatRequest() {
+
+        dbChatRequestRef.child(senderUserID).child(receiverUserID)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            dbChatRequestRef.child(receiverUserID)
+                                    .child(senderUserID)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if (task.isSuccessful()) {
+
+                                                sendMessageRequestButton.setEnabled(true);
+                                                currentState = "new";
+                                                sendMessageRequestButton.setText("Send message");
+
+                                                declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                declineMessageRequestButton.setEnabled(false);
+                                            }
+                                        }
+                                    });
+                        }
+
+                    }
+                });
 
     }
 
