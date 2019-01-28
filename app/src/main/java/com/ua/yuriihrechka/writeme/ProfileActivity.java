@@ -31,7 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String currentState;
     private String senderUserID;
 
-    private DatabaseReference dbUserRef, dbChatRequestRef;
+    private DatabaseReference dbUserRef, dbChatRequestRef, dbContactsRef;
     private FirebaseAuth auth;
 
     @Override
@@ -41,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         dbUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         dbChatRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat request");
+        dbContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
         auth = FirebaseAuth.getInstance();
         senderUserID = auth.getCurrentUser().getUid();
 
@@ -135,6 +136,23 @@ public class ProfileActivity extends AppCompatActivity {
                                 });
 
                             }
+                        }else {
+                            dbContactsRef.child(senderUserID)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.hasChild(receiverUserID)){
+                                                currentState = "friends";
+                                                sendMessageRequestButton.setText("Remove friend");
+
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
                         }
 
                     }
@@ -160,6 +178,10 @@ public class ProfileActivity extends AppCompatActivity {
                     if (currentState.equals("request_sent")){
                         cancelChatRequest();
                     }
+
+                    if (currentState.equals("request_sent")){
+                        acceptChatRequest();
+                    }
                 }
             });
 
@@ -167,6 +189,53 @@ public class ProfileActivity extends AppCompatActivity {
             sendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    private void acceptChatRequest() {
+
+        dbContactsRef.child(receiverUserID).child(senderUserID)
+                .child("Contacts").setValue("Saved")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+
+                            dbChatRequestRef.child(senderUserID).child(receiverUserID)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if (task.isSuccessful()) {
+
+                                                dbChatRequestRef.child(receiverUserID).child(senderUserID)
+                                                        .removeValue()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                                if (task.isSuccessful()) {
+
+                                                                    sendMessageRequestButton.setEnabled(true);
+                                                                    currentState = "friends";
+                                                                    sendMessageRequestButton.setTag("Remove friend");
+                                                                    declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                                    sendMessageRequestButton.setEnabled(false);
+
+                                                                }
+                                                            }
+                                                        });
+
+                                            }
+                                        }
+                                    });
+                        }
+
+                    }
+
+
+                });
     }
 
     private void cancelChatRequest() {
@@ -204,7 +273,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void sendChatRequest() {
-
         dbChatRequestRef.child(senderUserID).child(receiverUserID)
                 .child("request_type").setValue("sent")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
