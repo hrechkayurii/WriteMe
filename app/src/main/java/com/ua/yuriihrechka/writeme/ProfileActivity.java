@@ -179,7 +179,7 @@ public class ProfileActivity extends AppCompatActivity {
                         cancelChatRequest();
                     }
 
-                    if (currentState.equals("request_sent")){
+                    if (currentState.equals("request_received")){
                         acceptChatRequest();
                     }
 
@@ -231,7 +231,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void acceptChatRequest() {
 
-        dbContactsRef.child(receiverUserID).child(senderUserID)
+        dbContactsRef.child(senderUserID).child(receiverUserID)
                 .child("Contacts").setValue("saved")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -239,15 +239,15 @@ public class ProfileActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
 
-                            dbChatRequestRef.child(senderUserID).child(receiverUserID)
-                                    .removeValue()
+                            dbChatRequestRef.child(receiverUserID).child(senderUserID)
+                                    .child("Contacts").setValue("saved")
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
 
                                             if (task.isSuccessful()) {
 
-                                                dbChatRequestRef.child(receiverUserID).child(senderUserID)
+                                                dbChatRequestRef.child(senderUserID).child(receiverUserID)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
@@ -255,11 +255,23 @@ public class ProfileActivity extends AppCompatActivity {
 
                                                                 if (task.isSuccessful()) {
 
-                                                                    sendMessageRequestButton.setEnabled(true);
-                                                                    currentState = "friends";
-                                                                    sendMessageRequestButton.setTag("Remove friend");
-                                                                    declineMessageRequestButton.setVisibility(View.INVISIBLE);
-                                                                    sendMessageRequestButton.setEnabled(false);
+                                                                    dbChatRequestRef.child(receiverUserID).child(senderUserID)
+                                                                            .removeValue()
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                    if (task.isSuccessful()) {
+
+                                                                                        sendMessageRequestButton.setEnabled(true);
+                                                                                        currentState = "friends";
+                                                                                        sendMessageRequestButton.setTag("Remove friend");
+                                                                                        declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                                                        sendMessageRequestButton.setEnabled(false);
+
+                                                                                    }
+                                                                                }
+                                                                            });
 
                                                                 }
                                                             }
