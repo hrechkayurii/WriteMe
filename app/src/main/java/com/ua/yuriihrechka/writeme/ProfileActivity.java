@@ -182,6 +182,10 @@ public class ProfileActivity extends AppCompatActivity {
                     if (currentState.equals("request_sent")){
                         acceptChatRequest();
                     }
+
+                    if (currentState.equals("friends")){
+                        removeSpecificContact();
+                    }
                 }
             });
 
@@ -191,10 +195,44 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    private void removeSpecificContact() {
+
+        dbContactsRef.child(senderUserID).child(receiverUserID)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            dbContactsRef.child(receiverUserID)
+                                    .child(senderUserID)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if (task.isSuccessful()) {
+
+                                                sendMessageRequestButton.setEnabled(true);
+                                                currentState = "new";
+                                                sendMessageRequestButton.setText("Send message");
+
+                                                declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                declineMessageRequestButton.setEnabled(false);
+                                            }
+                                        }
+                                    });
+                        }
+
+                    }
+                });
+
+    }
+
     private void acceptChatRequest() {
 
         dbContactsRef.child(receiverUserID).child(senderUserID)
-                .child("Contacts").setValue("Saved")
+                .child("Contacts").setValue("saved")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
