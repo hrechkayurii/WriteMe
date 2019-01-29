@@ -24,7 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
+//20190129
 public class RequestFragment extends Fragment {
 
     private View requestFragmentView;
