@@ -84,7 +84,7 @@ public class ChatsFragment extends Fragment {
                             public void onCancelled(@NonNull DatabaseError databaseError) {
 
                             }
-                        })
+                        });
 
                     }
 
@@ -94,7 +94,7 @@ public class ChatsFragment extends Fragment {
 
                         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.users_display_layout, viewGroup, false);
                         return new ChatViewHolder(v);
-                                ;
+
                     }
                 };
 
