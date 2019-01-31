@@ -1,6 +1,7 @@
 package com.ua.yuriihrechka.writeme;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -89,7 +90,17 @@ public class ChatsFragment extends Fragment {
                                 final String retStatus = dataSnapshot.child("status").getValue().toString();
 
                                 holder.userName.setText(retName);
-                                holder.userStatus.setText(retStatus);
+                                holder.userStatus.setText("Last seen: "+"\n"+"Date "+"Time");
+
+                                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(getContext(), ChatActivity.class);
+                                        intent.putExtra("visit_user_id", userID);
+                                        intent.putExtra("visit_user_name", retName);
+                                        startActivity(intent);
+                                    }
+                                });
 
                             }
 
