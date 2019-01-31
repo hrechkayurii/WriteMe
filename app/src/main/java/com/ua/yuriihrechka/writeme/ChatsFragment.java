@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -70,13 +71,25 @@ public class ChatsFragment extends Fragment {
         FirebaseRecyclerAdapter<Contacts, ChatViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, ChatViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull ChatViewHolder holder, int position, @NonNull Contacts model) {
+                    protected void onBindViewHolder(@NonNull final ChatViewHolder holder, int position, @NonNull Contacts model) {
 
                         final String userID = getRef(position).getKey();
 
                         dbUserRef.child(userID).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                if (dataSnapshot.hasChild("image")){
+
+                                    final String retImage = dataSnapshot.child("image").getValue().toString();
+                                    Picasso.get().load(retImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
+                                }
+
+                                final String retName = dataSnapshot.child("name").getValue().toString();
+                                final String retStatus = dataSnapshot.child("status").getValue().toString();
+
+                                holder.userName.setText(retName);
+                                holder.userStatus.setText(retStatus);
 
                             }
 
