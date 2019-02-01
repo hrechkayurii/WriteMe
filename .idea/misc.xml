@@ -6,6 +6,7 @@
     </configurations>
   </component>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
@@ -45,6 +46,9 @@
 =======
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
 >>>>>>> f06175879dfc08bcc268f22472fc99cb42b62a25
+=======
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+>>>>>>> 02d939acfd918a64f2895f58bcb13408c729e1c5
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
