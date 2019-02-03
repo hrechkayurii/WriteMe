@@ -36,6 +36,8 @@ public class ChatsFragment extends Fragment {
     private String currentUserID;
 
 
+
+
     public ChatsFragment() {
         // Required empty public constructor
     }
@@ -75,32 +77,37 @@ public class ChatsFragment extends Fragment {
                     protected void onBindViewHolder(@NonNull final ChatViewHolder holder, int position, @NonNull Contacts model) {
 
                         final String userID = getRef(position).getKey();
+                        final String[] retImage = {"default_image"};
 
                         dbUserRef.child(userID).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                if (dataSnapshot.hasChild("image")){
+                                if (dataSnapshot.exists()) {
 
-                                    final String retImage = dataSnapshot.child("image").getValue().toString();
-                                    Picasso.get().load(retImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
-                                }
+                                    if (dataSnapshot.hasChild("image")) {
 
-                                final String retName = dataSnapshot.child("name").getValue().toString();
-                                final String retStatus = dataSnapshot.child("status").getValue().toString();
-
-                                holder.userName.setText(retName);
-                                holder.userStatus.setText("Last seen: "+"\n"+"Date "+"Time");
-
-                                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent intent = new Intent(getContext(), ChatActivity.class);
-                                        intent.putExtra("visit_user_id", userID);
-                                        intent.putExtra("visit_user_name", retName);
-                                        startActivity(intent);
+                                        retImage[0] = dataSnapshot.child("image").getValue().toString();
+                                        Picasso.get().load(retImage[0]).placeholder(R.drawable.profile_image).into(holder.profileImage);
                                     }
-                                });
+
+                                    final String retName = dataSnapshot.child("name").getValue().toString();
+                                    final String retStatus = dataSnapshot.child("status").getValue().toString();
+
+                                    holder.userName.setText(retName);
+                                    holder.userStatus.setText("Last seen: " + "\n" + "Date " + "Time");
+
+                                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                            chatIntent.putExtra("visit_user_id", userID);
+                                            chatIntent.putExtra("visit_user_name", retName);
+                                            chatIntent.putExtra("visit_user_image", retImage[0]);
+                                            startActivity(chatIntent);
+                                        }
+                                    });
+                                }
 
                             }
 
